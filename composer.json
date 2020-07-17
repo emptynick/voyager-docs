@@ -1,6 +1,6 @@
 {
-    "name": "voyager-admin/generic-boilerplate",
-    "description": "A boilerplate for a generic Voyager II plugin",
+    "name": "emptynick/voyager-docs",
+    "description": "Display the Voyager documentation directly in the UI",
     "license": "MIT",
     "authors": [
         {
@@ -13,14 +13,14 @@
     },
     "autoload": {
         "psr-4": {
-            "VoyagerAdmin\\GenericBoilerplate\\": "src/"
+            "Emptynick\\VoyagerDocs\\": "src/"
         }
     },
     "minimum-stability": "stable",
     "extra": {
         "laravel": {
             "providers": [
-                "VoyagerAdmin\\GenericBoilerplate\\GenericBoilerplateServiceProvider"
+                "Emptynick\\VoyagerDocs\\VoyagerDocsServiceProvider"
             ]
         }
     }

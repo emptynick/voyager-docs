@@ -1,18 +1,18 @@
 <?php
 
-namespace Voyager\GenericBoilerplate;
+namespace Emptynick\VoyagerDocs;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\View;
 use Voyager\Admin\Contracts\Plugins\GenericPlugin;
 
-class ThemeBoilerplate implements ThemePlugin
+class VoyagerDocs implements GenericPlugin
 {
-    public $name = 'Generic boilerplate';
-    public $description = 'A boilerplate for a generic Voyager II plugin';
-    public $repository = 'voyager-admin/generic-boilerplate';
-    public $website = 'https://github.com/voyager-admin/generic-boilerplate';
+    public $name = 'Voyager docs';
+    public $description = 'Display the Voyager documentation directly in the UI';
+    public $repository = 'emptynick/voyager-docs';
+    public $website = 'https://github.com/emptynick/voyager-docs';
     public $version = '1.0.0';
 
     public function getInstructionsView(): ?View
