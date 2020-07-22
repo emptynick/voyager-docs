@@ -135,7 +135,7 @@ class VoyagerDocs implements GenericPlugin
     public function registerMenuItems(MenuManager $menumanager)
     {
         $menumanager->addItems(
-            (new MenuItem('', ''))->divider(),
+            (new MenuItem())->divider(),
             (new MenuItem('Documentation', 'document'))->route('voyager-docs')
         );
     }
