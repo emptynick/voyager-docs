@@ -15,7 +15,9 @@ use League\CommonMark\Extension\HeadingPermalink\HeadingPermalinkRenderer;
 use League\CommonMark\Inline\Element\Image;
 use League\CommonMark\Inline\Element\Link;
 
+use Voyager\Admin\Classes\MenuItem;
 use Voyager\Admin\Contracts\Plugins\GenericPlugin;
+use Voyager\Admin\Manager\Menu as MenuManager;
 
 class VoyagerDocs implements GenericPlugin
 {
@@ -128,6 +130,14 @@ class VoyagerDocs implements GenericPlugin
         $content = str_replace(htmlspecialchars('{% endhint %}'), '</alert>', $content);
 
         return $content;
+    }
+
+    public function registerMenuItems(MenuManager $menumanager)
+    {
+        $menumanager->addItems(
+            (new MenuItem('', ''))->divider(),
+            (new MenuItem('Documentation', 'document'))->route('voyager-docs')
+        );
     }
 
     public function getCssRoutes(): array
