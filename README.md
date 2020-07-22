@@ -5,4 +5,4 @@ This plugin for Voyager II allows you to browse the official documentation direc
 ## TODO
 
 - Parse alert blocks
-- Parse and display images
+- Display images in a lightbox
