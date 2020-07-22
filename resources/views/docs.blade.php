@@ -21,7 +21,9 @@
             </div>
         </dropdown>
     </div>
-    {!! $content !!}
+    <div class="mt-4">
+        {!! $content !!}
+    </div>
 </card>
 
 @endsection

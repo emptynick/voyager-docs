@@ -75,6 +75,8 @@ class VoyagerDocs implements GenericPlugin
                 $title_pos = strpos($content, '</h1>');
                 $title = strip_tags(substr($content, 0, $title_pos));
                 $content = substr($content, $title_pos);
+
+                $content = $this->replaceAlerts($content);
                 
                 $linkrenderer->absolute = true;
                 $summary = $converter->convertToHtml(file_get_contents(base_path('vendor/voyager-admin/voyager/docs/summary.md')));
@@ -109,6 +111,23 @@ class VoyagerDocs implements GenericPlugin
 
             abort(404);
         })->name('voyager-docs-asset');
+    }
+
+    public function replaceAlerts($content) {
+        $content = str_replace([
+            htmlspecialchars('{% hint style="info" %}'),
+            htmlspecialchars('{% hint style="warning" %}'),
+            htmlspecialchars('{% hint style="danger" %}'),
+            htmlspecialchars('{% hint style="success" %}'),
+        ], [
+            '<alert color="blue" class="my-2">',
+            '<alert color="yellow" class="my-2">',
+            '<alert color="red" class="my-2">',
+            '<alert color="green" class="my-2">'
+        ], $content);
+        $content = str_replace(htmlspecialchars('{% endhint %}'), '</alert>', $content);
+
+        return $content;
     }
 
     public function getCssRoutes(): array
