@@ -5,7 +5,8 @@
 <card title="{{ $title }}">
     <div slot="actions">
         <dropdown>
-            <div class="p-2">
+            <div class="p-4">
+            <h4>Summary</h4>
                 {!! str_replace([
                     'Table of contents',
                     '<h2>',
