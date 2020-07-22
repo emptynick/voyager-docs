@@ -9,14 +9,14 @@
         }
     ],
     "require": {
-        "voyager-admin/admin": "2.x-dev"
+        "graham-campbell/markdown": "13.0"
     },
     "autoload": {
         "psr-4": {
             "Emptynick\\VoyagerDocs\\": "src/"
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "extra": {
         "laravel": {
             "providers": [

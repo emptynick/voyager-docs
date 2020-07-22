@@ -1,2 +1,8 @@
-# Voyager generic boilerplate
-This repository serves as a starting point to develop a custom generic plugin for Voyager II.
+# Voyager documentation
+
+This plugin for Voyager II allows you to browse the official documentation directly in your admin panel.
+
+## TODO
+
+- Parse alert blocks
+- Parse and display images
