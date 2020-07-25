@@ -1,6 +1,6 @@
 {
     "name": "emptynick/voyager-docs",
-    "description": "Display the Voyager documentation directly in the UI",
+    "description": "Display the Voyager documentation directly in your admin panel",
     "license": "MIT",
     "authors": [
         {

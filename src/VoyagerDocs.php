@@ -22,7 +22,7 @@ use Voyager\Admin\Manager\Menu as MenuManager;
 class VoyagerDocs implements GenericPlugin
 {
     public $name = 'Voyager docs';
-    public $description = 'Display the Voyager documentation directly in the UI';
+    public $description = 'Display the Voyager documentation directly in your admin panel';
     public $repository = 'emptynick/voyager-docs';
     public $website = 'https://github.com/emptynick/voyager-docs';
     public $version = '1.0.0';
