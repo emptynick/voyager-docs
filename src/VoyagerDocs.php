@@ -4,6 +4,7 @@ namespace Emptynick\VoyagerDocs;
 
 use GrahamCampbell\Markdown\Facades\Markdown;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -17,9 +18,11 @@ use League\CommonMark\Inline\Element\Link;
 
 use Voyager\Admin\Classes\MenuItem;
 use Voyager\Admin\Contracts\Plugins\GenericPlugin;
+use Voyager\Admin\Contracts\Plugins\Features\ProvideMenuItems;
+use Voyager\Admin\Contracts\Plugins\Features\ProvideProtectedRoutes;
 use Voyager\Admin\Manager\Menu as MenuManager;
 
-class VoyagerDocs implements GenericPlugin
+class VoyagerDocs implements GenericPlugin, ProvideProtectedRoutes, ProvideMenuItems
 {
     public $name = 'Voyager docs';
     public $description = 'Display the Voyager documentation directly in your admin panel';
@@ -32,17 +35,7 @@ class VoyagerDocs implements GenericPlugin
         'png'    => 'image/png',
     ];
 
-    public function getInstructionsView(): ?View
-    {
-        return null;
-    }
-
-    public function registerProtectedRoutes()
-    {
-        //
-    }
-
-    public function registerPublicRoutes()
+    public function provideProtectedRoutes(): void
     {
         Route::get('docs', function (Request $request) {
             $path = $request->get('path', 'introduction.md');
@@ -132,11 +125,11 @@ class VoyagerDocs implements GenericPlugin
         return $content;
     }
 
-    public function registerMenuItems(MenuManager $menumanager)
+    public function provideMenuItems(MenuManager $menumanager): void
     {
         $menumanager->addItems(
             (new MenuItem())->divider(),
-            (new MenuItem('Documentation', 'document'))->route('voyager-docs')
+            (new MenuItem('Documentation', 'document'))->route('voyager.voyager-docs')
         );
     }
 

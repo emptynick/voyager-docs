@@ -16,6 +16,6 @@ class ImageRenderer implements InlineRendererInterface
     {
         return new HtmlElement('div', [
             'class' => 'my-2 w-full flex justify-center',
-        ], '<img src="'.route('voyager-docs-asset').'?path='.Str::after($inline->getUrl(), '/assets/').'" />');
+        ], '<img src="'.route('voyager.voyager-docs-asset').'?path='.Str::after($inline->getUrl(), '/assets/').'" />');
     }
 }

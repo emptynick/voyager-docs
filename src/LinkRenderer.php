@@ -36,7 +36,7 @@ class LinkRenderer implements InlineRendererInterface
                 $path = $this->path . DIRECTORY_SEPARATOR;
             }
             $path = $this->getAbsoluteFilename($path . $inline->getUrl());
-            $attrs['href'] = route('voyager-docs').'?path='.$path;
+            $attrs['href'] = route('voyager.voyager-docs').'?path='.$path;
         }
 
         return new HtmlElement('a', $attrs, $htmlRenderer->renderInlines($inline->children()));
