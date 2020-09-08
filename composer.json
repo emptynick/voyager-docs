@@ -9,7 +9,7 @@
         }
     ],
     "require": {
-        "graham-campbell/markdown": "13.0"
+        "graham-campbell/markdown": "13.1"
     },
     "autoload": {
         "psr-4": {

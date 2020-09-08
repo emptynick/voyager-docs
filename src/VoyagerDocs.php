@@ -18,11 +18,11 @@ use League\CommonMark\Inline\Element\Link;
 
 use Voyager\Admin\Classes\MenuItem;
 use Voyager\Admin\Contracts\Plugins\GenericPlugin;
-use Voyager\Admin\Contracts\Plugins\Features\ProvideMenuItems;
-use Voyager\Admin\Contracts\Plugins\Features\ProvideProtectedRoutes;
+use Voyager\Admin\Contracts\Plugins\Features\Provider\MenuItems;
+use Voyager\Admin\Contracts\Plugins\Features\Provider\ProtectedRoutes;
 use Voyager\Admin\Manager\Menu as MenuManager;
 
-class VoyagerDocs implements GenericPlugin, ProvideProtectedRoutes, ProvideMenuItems
+class VoyagerDocs implements GenericPlugin, ProtectedRoutes, MenuItems
 {
     public $name = 'Voyager docs';
     public $description = 'Display the Voyager documentation directly in your admin panel';
@@ -75,6 +75,9 @@ class VoyagerDocs implements GenericPlugin, ProvideProtectedRoutes, ProvideMenuI
                 
                 $linkrenderer->absolute = true;
                 $summary = $converter->convertToHtml(file_get_contents(base_path('vendor/voyager-admin/voyager/docs/summary.md')));
+
+                $this->preferences->set('none', 'Miau');
+                dd($this->preferences->get('none', 'Doesnt exist', false));
 
                 return view('voyager-docs::docs', compact(
                     'content',
