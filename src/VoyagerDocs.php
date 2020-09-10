@@ -76,9 +76,6 @@ class VoyagerDocs implements GenericPlugin, ProtectedRoutes, MenuItems
                 $linkrenderer->absolute = true;
                 $summary = $converter->convertToHtml(file_get_contents(base_path('vendor/voyager-admin/voyager/docs/summary.md')));
 
-                $this->preferences->set('none', 'Miau');
-                dd($this->preferences->get('none', 'Doesnt exist', false));
-
                 return view('voyager-docs::docs', compact(
                     'content',
                     'summary',
