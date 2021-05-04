@@ -8,9 +8,6 @@
             "email": "info@cschweppe.de"
         }
     ],
-    "require": {
-        "graham-campbell/markdown": "13.1"
-    },
     "autoload": {
         "psr-4": {
             "Emptynick\\VoyagerDocs\\": "src/"

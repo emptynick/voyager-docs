@@ -11,9 +11,4 @@ class VoyagerDocsServiceProvider extends ServiceProvider
     {
         $pluginmanager->addPlugin(\Emptynick\VoyagerDocs\VoyagerDocs::class);
     }
-
-    public function register()
-    {
-        $this->loadViewsFrom(realpath(__DIR__.'/../resources/views'), 'voyager-docs');
-    }
 }
