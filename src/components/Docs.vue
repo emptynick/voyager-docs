@@ -12,8 +12,14 @@
 
 <script>
 import hljs from 'highlight.js/lib/core';
+
 import php from 'highlight.js/lib/languages/php';
+import css from 'highlight.js/lib/languages/css';
+import javascript from 'highlight.js/lib/languages/javascript';
+
 hljs.registerLanguage('php', php);
+hljs.registerLanguage('css', php);
+hljs.registerLanguage('javascript', php);
 
 export default {
     props: {
