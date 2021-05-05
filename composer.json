@@ -8,6 +8,7 @@
             "email": "info@cschweppe.de"
         }
     ],
+    "keywords": ["voyager2-plugin", "voyager-docs", "voyager", "documentation"],
     "autoload": {
         "psr-4": {
             "Emptynick\\VoyagerDocs\\": "src/"
