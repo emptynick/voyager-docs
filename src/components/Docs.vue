@@ -35,7 +35,9 @@ export default {
                     this.parseLists(
                         this.parseInfoBlocks(
                             this.parseHeadings(
-                                this.parseCode(input)
+                                this.parseCode(
+                                    this.parseTables(input)
+                                )
                             )
                         )
                     )
@@ -93,6 +95,9 @@ export default {
             return input.replace(/<code class=\"language-([^&]+)\">([^<]+)<\/code>/gmi, (block, language, content) => {
                 return `<code>${hljs.highlight(this.decodeHtml(content), {language: language}).value}</code>`;
             });
+        },
+        parseTables(input) {
+            return input.replaceAll('<table>', '<div class="voyager-table"><table>').replaceAll('</table>', '</div></table>');
         },
         decodeHtml(html) {
             var txt = document.createElement('textarea');
