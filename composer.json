@@ -14,7 +14,6 @@
             "Emptynick\\VoyagerDocs\\": "src/"
         }
     },
-    "minimum-stability": "dev",
     "extra": {
         "laravel": {
             "providers": [
