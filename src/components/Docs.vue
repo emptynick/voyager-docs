@@ -97,7 +97,7 @@ export default {
             });
         },
         parseTables(input) {
-            return input.replaceAll('<table>', '<div class="voyager-table"><table>').replaceAll('</table>', '</div></table>');
+            return input.replaceAll('<table>', '<div class="voyager-table"><table>').replaceAll('</table>', '</table></div>');
         },
         decodeHtml(html) {
             var txt = document.createElement('textarea');
