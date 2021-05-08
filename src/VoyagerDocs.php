@@ -39,23 +39,27 @@ class VoyagerDocs implements GenericPlugin, ProtectedRoutes, MenuItems, JS
     {
         Route::get('docs', function (Request $request) {
             $path = $request->get('path', 'introduction.md');
+            $currentPath = $path;
             $path = str_replace('/', DIRECTORY_SEPARATOR, Str::start(urldecode($path), '/'));
-            $start = Str::beforeLast(urldecode($path), DIRECTORY_SEPARATOR);
+
+            if (Str::contains($path, '..')) {
+                abort(404);
+            }
+
             $path = base_path('vendor/voyager-admin/voyager/docs').$path;
 
-            $content = file_get_contents($path);
-
-            // TODO: Uncomment when live
-            /*if (realpath($path) != $path) {
-                abort(404);
-            }*/
-
             if (File::exists($path)) {
+                $content = file_get_contents($path);
+                $title = Str::after(Str::before($content, "\n"), '# ');
+                $content = $this->parseHTML(Str::markdown(Str::after($content, "\n")), true);
+                $toc = $this->parseSummary(Str::markdown(Str::after(file_get_contents(base_path('vendor/voyager-admin/voyager/docs/summary.md')), "\n")));
+
                 return Inertia::render('voyager-docs', [
-                    'title'     => Str::replaceFirst('# ', '', strtok($content, "\n")),
-                    'content'   => Str::markdown(preg_replace('/^.+\n/', '', $content)),
-                    'toc'       => Str::markdown(preg_replace('/^.+\n/', '', file_get_contents(base_path('vendor/voyager-admin/voyager/docs/summary.md')))),
-                    'path'      => $request->get('path', 'introduction.md')
+                    'title'     => $title,
+                    'content'   => $content,
+                    'toc'       => $toc,
+                    'path'      => $request->get('path', 'introduction.md'),
+                    'current'   => $currentPath,
                 ]);
             }
 
@@ -91,11 +95,59 @@ class VoyagerDocs implements GenericPlugin, ProtectedRoutes, MenuItems, JS
 
     public function provideMenuItems(MenuManager $menumanager): void
     {
-        $item = (new MenuItem('Documentation', 'document'))->route('voyager.voyager-docs');
+        $item = (new MenuItem('Documentation', 'document-search'))->route('voyager.voyager-docs');
 
         $menumanager->addItems(
             (new MenuItem())->divider(),
             $item
         );
+    }
+
+    private function parseHTML($content, $relative = true)
+    {
+        // Smallen heading
+        
+        // Replace links
+
+        // Replace tables
+        $content = str_replace(['<table>', '</table>'], ['<div class="voyager-table"><table>', '</table></div>'], $content);
+
+        return $content;
+    }
+
+    private function parseSummary($content)
+    {
+        $xml = simplexml_load_string('<div>'.$content.'</div>');
+        $array = [];
+        $lastMain = '';
+        foreach ($xml->children() as $node) {
+            if (in_array($node->getName(), ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])) {
+                $array[(string) $node] = [];
+                $lastMain = (string) $node;
+            } else {
+                $array[$lastMain] = $this->ulToArray($node);
+            }
+        }
+        
+        return $array;
+    }
+
+    private function ulToArray($ul)
+    {
+        $array = [];
+        if ($ul->getName() == 'ul') {
+            foreach ($ul->children() as $node) {
+                if (count($node->children()) > 1) {
+                    $array[(string) $node->children()[0]] = $this->ulToArray($node->children()[1]);
+                } else {
+                    $array[] = [
+                        'title' => (string) $node->children()[0],
+                        'href'  => (string) $node->children()[0]->attributes()['href']
+                    ];
+                }
+            }
+        }
+
+        return $array;
     }
 }

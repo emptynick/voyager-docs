@@ -1,13 +1,30 @@
 <template>
-    <div>
-        <collapsible title="Table of contents" closed>
-            <div v-html="parseContent(toc)"></div>
-        </collapsible>
-
-        <card :title="title">
-            <div id="doc-content" v-html="parseContent(content)"></div>
-        </card>
-    </div>
+    <card :title="title">
+        <div class="w-full my-4">
+            <template v-for="(main, title) in toc">
+                <template v-if="title !== ''">
+                    <dropdown class="self-center" placement="bottom-start">
+                        <template v-for="(sub, subtitle) in main">
+                            <a v-if="sub.title" :href="getLink(sub.href)" class="link rounded">{{ sub.title }}</a>
+                            <div v-else class="block mx-6 my-3 leading-tight">
+                                <span class="block px-6">{{ subtitle }}</span>
+                                <a v-for="subsub in sub" :href="getLink(subsub.href)" class="link rounded mx-2">
+                                    {{ subsub.title }}
+                                </a>
+                            </div>
+                        </template>
+                        <template #opener>
+                            <button class="button accent">{{ title }}</button>
+                        </template>
+                    </dropdown>
+                </template>
+                <template v-else>
+                    <a class="button accent" :href="getLink(main[0].href)">{{ main[0].title }}</a>
+                </template>
+            </template>
+        </div>
+        <div id="doc-content" v-html="parseContent(content, true)"></div>
+    </card>
 </template>
 
 <script>
@@ -25,33 +42,38 @@ export default {
     props: {
         title: String,
         content: String,
-        toc: String,
-        path: String
+        toc: Object,
+        path: String,
+        current: String,
     },
     methods: {
-        parseContent(input) {
+        parseContent(input, relative) {
             let content = this.parseLinks(
                 this.parseImages(
                     this.parseLists(
                         this.parseInfoBlocks(
-                            this.parseHeadings(
                                 this.parseCode(
-                                    this.parseTables(input)
+                                    input
                                 )
-                            )
                         )
                     )
                 )
-            );
+            , relative);
 
             return content;
         },
-        parseLinks(input) {
+        parseLinks(input, relative) {
             return input.replace(/href=\"(.+)\"/g, (block, url) => {
                 if (url.startsWith('#')) {
                     return `href="${url}"`;
                 } else if (!url.startsWith('https://') && !url.startsWith('http://')) {
-                    url = url.replaceAll('../', '');
+                    if (!relative) {
+                        url = url.replaceAll('./', '');
+                        return `href="${route('voyager.voyager-docs')}?path=${url}"`;
+                    }
+                    let current = this.current.substring(0, this.current.lastIndexOf('/'));
+                    url = this.resolveRelativePath(current+'/'+url);
+                    url = url.replaceAll('./', '');
 
                     return `href="${route('voyager.voyager-docs')}?path=${url}"`;
                 }
@@ -96,14 +118,27 @@ export default {
                 return `<code>${hljs.highlight(this.decodeHtml(content), {language: language}).value}</code>`;
             });
         },
-        parseTables(input) {
-            return input.replaceAll('<table>', '<div class="voyager-table"><table>').replaceAll('</table>', '</table></div>');
-        },
         decodeHtml(html) {
             var txt = document.createElement('textarea');
             txt.innerHTML = html;
 
             return txt.value;
+        },
+        resolveRelativePath(path) {
+            var parts = path.split('/');
+            var i = 1;
+            while (i < parts.length) {
+                if (parts[i] === '..' && i > 0 && parts[i-1] !== '..') {
+                    parts.splice(i-1, 2);
+                    i -= 2;
+                }
+                i++;
+            }
+
+            return parts.join('/');
+        },
+        getLink(link) {
+            return `${this.route('voyager.voyager-docs')}?path=${link}`;
         }
     }
 }
