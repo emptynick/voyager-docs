@@ -1,6 +1,6 @@
 <template>
     <card :title="title">
-        <div class="w-full my-4">
+        <div class="w-full my-4 flex space-x-1">
             <template v-for="(main, title) in toc">
                 <template v-if="title !== ''">
                     <dropdown class="self-center" placement="bottom-start">
