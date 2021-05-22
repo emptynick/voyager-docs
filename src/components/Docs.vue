@@ -32,11 +32,13 @@ import hljs from 'highlight.js/lib/core';
 
 import php from 'highlight.js/lib/languages/php';
 import css from 'highlight.js/lib/languages/css';
+import json from 'highlight.js/lib/languages/json';
 import javascript from 'highlight.js/lib/languages/javascript';
 
 hljs.registerLanguage('php', php);
 hljs.registerLanguage('css', php);
-hljs.registerLanguage('javascript', php);
+hljs.registerLanguage('json', json);
+hljs.registerLanguage('javascript', javascript);
 
 export default {
     props: {

@@ -55,12 +55,11 @@ class VoyagerDocs implements GenericPlugin, ProtectedRoutes, MenuItems, JS
                 $toc = $this->parseSummary(Str::markdown(Str::after(file_get_contents(base_path('vendor/voyager-admin/voyager/docs/summary.md')), "\n")));
 
                 return Inertia::render('voyager-docs', [
-                    'title'     => $title,
                     'content'   => $content,
                     'toc'       => $toc,
                     'path'      => $request->get('path', 'introduction.md'),
                     'current'   => $currentPath,
-                ]);
+                ])->withViewData('title', $title);
             }
 
             abort(404);
