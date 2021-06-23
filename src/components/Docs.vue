@@ -14,7 +14,10 @@
                             </div>
                         </template>
                         <template #opener>
-                            <button class="button accent">{{ title }}</button>
+                            <button class="button accent">
+                                <span>{{ title }}</span>
+                                <icon icon="chevron-down" />
+                            </button>
                         </template>
                     </dropdown>
                 </template>
@@ -36,7 +39,7 @@ import json from 'highlight.js/lib/languages/json';
 import javascript from 'highlight.js/lib/languages/javascript';
 
 hljs.registerLanguage('php', php);
-hljs.registerLanguage('css', php);
+hljs.registerLanguage('css', css);
 hljs.registerLanguage('json', json);
 hljs.registerLanguage('javascript', javascript);
 
