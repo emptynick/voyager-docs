@@ -6,6 +6,7 @@ body:
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report!
+        Please make sure to be as clear as possible.
   - type: input
     id: laravel_version
     attributes:
