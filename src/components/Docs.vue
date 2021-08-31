@@ -119,8 +119,8 @@ export default {
             });
         },
         parseCode(input) {
-            return input.replace(/<code class=\"language-([^&]+)\">([^<]+)<\/code>/gmi, (block, language, content) => {
-                return `<code>${hljs.highlight(this.decodeHtml(content), {language: language}).value}</code>`;
+            return input.replace(/<code class=\"language-(.*?)\"\>(.*?)<\/code>/gmis, (block, language, content) => {
+                return `<code style="padding: 0 !important">${hljs.highlight(this.decodeHtml(content), {language: language}).value}</code>`;
             });
         },
         decodeHtml(html) {
