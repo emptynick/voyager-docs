@@ -27,7 +27,7 @@
             </template>
         </div>
         <div id="doc-content" v-html="parseContent(content, true)"></div>
-    </Dard>
+    </Card>
 </template>
 
 <script>
