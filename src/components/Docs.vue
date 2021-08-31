@@ -58,7 +58,7 @@ export default {
                     this.parseLists(
                         this.parseInfoBlocks(
                                 this.parseCode(
-                                    input
+                                    this.parseHeadings(input)
                                 )
                         )
                     )
