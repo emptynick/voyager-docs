@@ -20,5 +20,8 @@
                 "Emptynick\\VoyagerDocs\\VoyagerDocsServiceProvider"
             ]
         }
+    },
+    "require": {
+        "league/commonmark": "^2.0"
     }
 }

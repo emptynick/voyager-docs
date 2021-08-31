@@ -3,18 +3,11 @@
 namespace Emptynick\VoyagerDocs;
 
 use Illuminate\Http\Request;
-use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
-use Illuminate\View\View;
 use Inertia\Inertia;
-use League\CommonMark\CommonMarkConverter;
-use League\CommonMark\Environment;
-use League\CommonMark\Extension\HeadingPermalink\HeadingPermalinkExtension;
-use League\CommonMark\Extension\HeadingPermalink\HeadingPermalinkRenderer;
-use League\CommonMark\Inline\Element\Image;
-use League\CommonMark\Inline\Element\Link;
 
 use Voyager\Admin\Classes\MenuItem;
 use Voyager\Admin\Contracts\Plugins\GenericPlugin;
@@ -37,7 +30,10 @@ class VoyagerDocs implements GenericPlugin, ProtectedRoutes, MenuItems, JS
 
     public function provideProtectedRoutes(): void
     {
+        Inertia::setRootView('voyager::app');
+
         Route::get('docs', function (Request $request) {
+            Event::dispatch('voyager.page');
             $path = $request->get('path', 'introduction.md');
             $currentPath = $path;
             $path = str_replace('/', DIRECTORY_SEPARATOR, Str::start(urldecode($path), '/'));
@@ -55,6 +51,7 @@ class VoyagerDocs implements GenericPlugin, ProtectedRoutes, MenuItems, JS
                 $toc = $this->parseSummary(Str::markdown(Str::after(file_get_contents(base_path('vendor/voyager-admin/voyager/docs/summary.md')), "\n")));
 
                 return Inertia::render('voyager-docs', [
+                    'title'     => $title,
                     'content'   => $content,
                     'toc'       => $toc,
                     'path'      => $request->get('path', 'introduction.md'),
@@ -105,7 +102,7 @@ class VoyagerDocs implements GenericPlugin, ProtectedRoutes, MenuItems, JS
     private function parseHTML($content, $relative = true)
     {
         // Smallen heading
-        
+        $content = str_replace(['<h1>', '<h2>', '<h3>'], ['<h1 class="mb-2 mt-4">', '<h2 class="mb-2 mt-4">', '<h3 class="mb-2 mt-4">'], $content);
         // Replace links
 
         // Replace tables

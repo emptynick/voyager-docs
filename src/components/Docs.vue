@@ -1,9 +1,9 @@
 <template>
-    <card :title="title">
+    <Card :title="title">
         <div class="w-full my-4 flex space-x-1">
             <template v-for="(main, title) in toc">
                 <template v-if="title !== ''">
-                    <dropdown class="self-center" placement="bottom-start">
+                    <Dropdown class="self-center" placement="bottom-start">
                         <template v-for="(sub, subtitle) in main">
                             <a v-if="sub.title" :href="getLink(sub.href)" class="link rounded">{{ sub.title }}</a>
                             <div v-else class="block mx-6 my-3 leading-tight">
@@ -16,10 +16,10 @@
                         <template #opener>
                             <button class="button accent">
                                 <span>{{ title }}</span>
-                                <icon icon="chevron-down" />
+                                <Icon icon="chevron-down" />
                             </button>
                         </template>
-                    </dropdown>
+                    </Dropdown>
                 </template>
                 <template v-else>
                     <a class="button accent" :href="getLink(main[0].href)">{{ main[0].title }}</a>
@@ -27,7 +27,7 @@
             </template>
         </div>
         <div id="doc-content" v-html="parseContent(content, true)"></div>
-    </card>
+    </Dard>
 </template>
 
 <script>
