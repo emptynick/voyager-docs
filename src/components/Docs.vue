@@ -1,6 +1,6 @@
 <template>
     <Card :title="title">
-        <div class="w-full my-4 flex space-x-1">
+        <div class="w-full my-4 flex flex-wrap space-x-1 space-y-1">
             <template v-for="(main, title) in toc">
                 <template v-if="title !== ''">
                     <Dropdown class="self-center" placement="bottom-start">
@@ -28,6 +28,9 @@
         </div>
         <div id="doc-content" v-html="parseContent(content, true)"></div>
     </Card>
+    <Modal ref="imageModal">
+        <img :src="selectedImageSource" class="w-full">
+    </Modal>
 </template>
 
 <script>
@@ -103,7 +106,7 @@ export default {
                 if (!url.startsWith('https://') && !url.startsWith('http://')) {
                     url = url.replaceAll('../', '').replace('.gitbook/assets/', '');
 
-                    return `src="${route('voyager.voyager-docs-asset')}?path=${url}" class="mx-auto py-2 w-full lg:w-4/6"`;
+                    return `src="${route('voyager.voyager-docs-asset')}?path=${url}" class="mx-auto py-2 w-full lg:w-4/6 cursor-pointer"`;
                 }
 
                 return `src="${url}"`;
@@ -145,6 +148,22 @@ export default {
         getLink(link) {
             return `${this.route('voyager.voyager-docs')}?path=${link}`;
         }
+    },
+    data() {
+        return {
+            selectedImageSource: null,
+        }
+    },
+    mounted() {
+        document.getElementById('doc-content').getElementsByTagName('img').forEach((image) => {
+            if (image.src.startsWith(`${route('voyager.voyager-docs-asset')}?path=`)) {
+                image.addEventListener('click', () => {
+                    this.selectedImageSource = image.src;
+
+                    this.$refs.imageModal.open();
+                });
+            }
+        });
     }
 }
 </script>
