@@ -102,7 +102,7 @@ class VoyagerDocs implements GenericPlugin, ProtectedRoutes, MenuItems, JS
     private function parseHTML($content, $relative = true)
     {
         // Replace tables
-        $content = str_replace(['<table>', '</table>'], ['<div class="voyager-table"><table>', '</table></div>'], $content);
+        $content = str_replace(['<table>', '</table>', '<p>'], ['<div class="voyager-table"><table>', '</table></div>', '<p class="mb-4">'], $content);
 
         return $content;
     }
