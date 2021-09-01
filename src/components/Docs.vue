@@ -103,7 +103,7 @@ export default {
                 if (!url.startsWith('https://') && !url.startsWith('http://')) {
                     url = url.replaceAll('../', '').replace('.gitbook/assets/', '');
 
-                    return `src="${route('voyager.voyager-docs-asset')}?path=${url}" class="mx-auto py-2"`;
+                    return `src="${route('voyager.voyager-docs-asset')}?path=${url}" class="mx-auto py-2 w-full lg:w-4/6"`;
                 }
 
                 return `src="${url}"`;
