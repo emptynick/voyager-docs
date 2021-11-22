@@ -13,10 +13,11 @@ export default defineConfig({
       fileName: 'voyager-docs'
     },
     rollupOptions: {
-      external: ['vue'],
+      external: ['vue', 'marked'],
       output: {
         globals: {
-          vue: 'Vue'
+          vue: 'Vue',
+          marked: 'marked',
         }
       }
     }

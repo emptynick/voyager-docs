@@ -3,7 +3,6 @@
 namespace Emptynick\VoyagerDocs;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -32,56 +31,36 @@ class VoyagerDocs implements GenericPlugin, ProtectedRoutes, MenuItems, JS
     {
         Inertia::setRootView('voyager::app');
 
-        Route::get('docs', function (Request $request) {
-            Event::dispatch('voyager.page');
-            $path = $request->get('path', 'introduction.md');
-            $currentPath = $path;
-            $path = str_replace('/', DIRECTORY_SEPARATOR, Str::start(urldecode($path), '/'));
-
-            if (Str::contains($path, '..')) {
-                abort(404);
-            }
-
-            $path = base_path('vendor/voyager-admin/voyager/docs').$path;
-
+        Route::get('docs/{path?}', function ($path = 'introduction.md') {
+            $path = base_path('vendor/voyager-admin/voyager/docs/').$path;
             if (File::exists($path)) {
                 $content = file_get_contents($path);
+
+                if (Str::contains($path, '.gitbook')) {
+                    $extension = Str::afterLast($path, '.');
+                    $mime = $this->mime_extensions[$extension] ?? File::mimeType($path);
+
+                    $response = response(File::get($path), 200, ['Content-Type' => $mime]);
+                    $response->setSharedMaxAge(31536000);
+                    $response->setMaxAge(31536000);
+                    $response->setExpires(new \DateTime('+1 year'));
+
+                    return $response;
+                }
+
                 $title = Str::after(Str::before($content, "\n"), '# ');
-                $content = $this->parseHTML(Str::markdown(Str::after($content, "\n")), true);
-                $toc = $this->parseSummary(Str::markdown(Str::after(file_get_contents(base_path('vendor/voyager-admin/voyager/docs/summary.md')), "\n")));
 
                 return Inertia::render('voyager-docs', [
                     'title'     => $title,
                     'content'   => $content,
-                    'toc'       => $toc,
-                    'path'      => $request->get('path', 'introduction.md'),
-                    'current'   => $currentPath,
+                    'toc'       => Str::after(file_get_contents(base_path('vendor/voyager-admin/voyager/docs/summary.md')), "\n"),
+                    'path'      => Str::beforeLast(\Request::url(), '/').'/',
+                    'base'      => route('voyager.voyager-docs').'/',
                 ])->withViewData('title', $title);
             }
 
             abort(404);
-        })->name('voyager-docs');
-
-        Route::get('docs-asset', function (Request $request) {
-            $path = $request->get('path', '');
-            $path = str_replace('/', DIRECTORY_SEPARATOR, Str::start(urldecode($path), '/'));
-            $start = Str::beforeLast(urldecode($path), DIRECTORY_SEPARATOR);
-            $path = base_path('vendor/voyager-admin/voyager/docs/.gitbook/assets').$path;
-
-            if (File::exists($path)) {
-                $extension = Str::afterLast($path, '.');
-                $mime = $this->mime_extensions[$extension] ?? File::mimeType($path);
-
-                $response = response(File::get($path), 200, ['Content-Type' => $mime]);
-                $response->setSharedMaxAge(31536000);
-                $response->setMaxAge(31536000);
-                $response->setExpires(new \DateTime('+1 year'));
-
-                return $response;
-            }
-
-            abort(404);
-        })->name('voyager-docs-asset');
+        })->where('path', '.*')->name('voyager-docs');
     }
 
     public function provideJS(): string
@@ -97,49 +76,5 @@ class VoyagerDocs implements GenericPlugin, ProtectedRoutes, MenuItems, JS
             (new MenuItem())->divider(),
             $item
         );
-    }
-
-    private function parseHTML($content, $relative = true)
-    {
-        // Replace tables
-        $content = str_replace(['<table>', '</table>', '<p>'], ['<div class="voyager-table"><table>', '</table></div>', '<p class="mb-4">'], $content);
-
-        return $content;
-    }
-
-    private function parseSummary($content)
-    {
-        $xml = simplexml_load_string('<div>'.$content.'</div>');
-        $array = [];
-        $lastMain = '';
-        foreach ($xml->children() as $node) {
-            if (in_array($node->getName(), ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])) {
-                $array[(string) $node] = [];
-                $lastMain = (string) $node;
-            } else {
-                $array[$lastMain] = $this->ulToArray($node);
-            }
-        }
-        
-        return $array;
-    }
-
-    private function ulToArray($ul)
-    {
-        $array = [];
-        if ($ul->getName() == 'ul') {
-            foreach ($ul->children() as $node) {
-                if (count($node->children()) > 1) {
-                    $array[(string) $node->children()[0]] = $this->ulToArray($node->children()[1]);
-                } else {
-                    $array[] = [
-                        'title' => (string) $node->children()[0],
-                        'href'  => (string) $node->children()[0]->attributes()['href']
-                    ];
-                }
-            }
-        }
-
-        return $array;
     }
 }
