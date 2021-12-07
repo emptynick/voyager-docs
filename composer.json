@@ -21,7 +21,8 @@
             ]
         }
     },
+    "minimum-stability": "dev",
     "require": {
-        "league/commonmark": "^2.0"
+        "voyager-admin/voyager": "2.x-dev"
     }
 }

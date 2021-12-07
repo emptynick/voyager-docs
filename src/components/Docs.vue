@@ -1,22 +1,24 @@
 <template>
-    <Card :title="title">
-        <template #actions>
-            <SlideIn>
-                <MarkdownView :options="{ baseUrl: base }" :renderer="renderer()">{{ toc }}</MarkdownView>
-                <template #opener>
-                    <button class="button blue">Menu</button>
-                </template>
-            </SlideIn>
-        </template>
-        <div id="doc-content">
-            <MarkdownView :options="{ baseUrl: path }" :renderer="renderer()" ref="mdcontent">{{ content }}</MarkdownView>
-        </div>
-    </Card>
-    <Modal ref="imageModal" :title="selectedImageTitle" size="full">
-        <div class="w-full inline-flex self-center">
-            <img :src="selectedImageSource" class="max-w-full">
-        </div>
-    </Modal>
+    <div>
+        <Card :title="title">
+            <template #actions>
+                <SlideIn>
+                    <MarkdownView :options="{ baseUrl: base }" :renderer="renderer()">{{ toc }}</MarkdownView>
+                    <template #opener>
+                        <button class="button blue">Menu</button>
+                    </template>
+                </SlideIn>
+            </template>
+            <div id="doc-content">
+                <MarkdownView :options="{ baseUrl: path }" :renderer="renderer()" ref="mdcontent">{{ content }}</MarkdownView>
+            </div>
+        </Card>
+        <Modal ref="imageModal" :title="selectedImageTitle" size="full">
+            <div class="w-full inline-flex self-center">
+                <img :src="selectedImageSource" class="max-w-full">
+            </div>
+        </Modal>
+    </div>
 </template>
 
 <script>
