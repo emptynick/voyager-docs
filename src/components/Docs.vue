@@ -51,6 +51,9 @@ export default {
                 },
                 image(href, title, text) {
                     return `<img src="${base}${href.replace('../', '')}" alt="${title || text}" class="mx-auto py-2 max-w-full lg:max-w-4/6 cursor-pointer">`;
+                },
+                table(header, body) {
+                    return `<div class="voyager-table striped"><table><thead>${header}</thead>${body}</table></div>`;
                 }
             }
         }
