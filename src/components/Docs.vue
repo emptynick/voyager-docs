@@ -1,7 +1,7 @@
 <template>
     <div>
         <Card title="On this page">
-            <div class="inline-flex space-x-2">
+            <div class="flex-wrap space-x-2 space-y-2">
                 <a class="button accent" v-for="heading in headings" :key="`heading-${heading}`" :href="`#${slugify(heading, { lower: true })}`">
                     {{ heading }}
                 </a>
@@ -36,6 +36,8 @@ import css from 'highlight.js/lib/languages/css';
 import json from 'highlight.js/lib/languages/json';
 import javascript from 'highlight.js/lib/languages/javascript';
 
+import EventBus from 'eventbus';
+
 hljs.registerLanguage('php', php);
 hljs.registerLanguage('css', css);
 hljs.registerLanguage('json', json);
@@ -68,6 +70,7 @@ export default {
                     if (level == 1) {
                         return '';
                     }
+                    EventBus.emit('docs-push-heading', src);
 
                     return `<h${level+1} class="mt-4" id="${slugify(src, { lower: true })}">${src}</h${level+1}>`;
                 },
@@ -89,6 +92,8 @@ export default {
         return {
             selectedImageSource: null,
             selectedImageTitle: null,
+            headings: [],
+            heads: [],
         }
     },
     mounted() {
@@ -110,6 +115,10 @@ export default {
             document.querySelectorAll('pre code').forEach((el) => {
                 hljs.highlightElement(el);
             });
+        });
+
+        EventBus.on('docs-push-heading', (src) => {
+            this.headings.push(src);
         });
     }
 }
