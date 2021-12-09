@@ -2,19 +2,18 @@
 
 namespace Emptynick\VoyagerDocs;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
-use Voyager\Admin\Classes\MenuItem;
+use Voyager\Admin\Classes\{MenuItem, UserMenuItem};
 use Voyager\Admin\Contracts\Plugins\GenericPlugin;
-use Voyager\Admin\Contracts\Plugins\Features\Provider\MenuItems;
-use Voyager\Admin\Contracts\Plugins\Features\Provider\JS;
-use Voyager\Admin\Contracts\Plugins\Features\Provider\ProtectedRoutes;
+use Voyager\Admin\Contracts\Plugins\Features\Provider\{MenuItems, JS, ProtectedRoutes, Widgets};
 use Voyager\Admin\Manager\Menu as MenuManager;
 
-class VoyagerDocs implements GenericPlugin, ProtectedRoutes, MenuItems, JS
+class VoyagerDocs implements GenericPlugin, ProtectedRoutes, MenuItems, JS, Widgets
 {
     public $name = 'Voyager docs';
     public $description = 'Display the Voyager documentation directly in your admin panel';
@@ -25,6 +24,14 @@ class VoyagerDocs implements GenericPlugin, ProtectedRoutes, MenuItems, JS
         'jpg'    => 'image/jpeg',
         'png'    => 'image/png',
     ];
+
+    public function provideWidgets(): Collection
+    {
+        return collect([(new \Voyager\Admin\Classes\Widget('voyager-docs-widget', 'Documentation'))->parameters([
+            'toc' => $this->getTOC(),
+            'base' => Str::finish(route('voyager.voyager-docs'), '/')
+        ])]);
+    }
 
     public function provideProtectedRoutes(): void
     {
@@ -53,7 +60,7 @@ class VoyagerDocs implements GenericPlugin, ProtectedRoutes, MenuItems, JS
                 return Inertia::render('voyager-docs', [
                     'title'     => $title,
                     'content'   => $content,
-                    'toc'       => Str::after(file_get_contents(base_path('vendor/voyager-admin/voyager/docs/summary.md')), "\n"),
+                    'toc'       => $this->getTOC(),
                     'path'      => Str::beforeLast(\Request::url(), '/').'/',
                     'base'      => Str::finish(route('voyager.voyager-docs'), '/'),
                     'page'      => $relative,
@@ -71,11 +78,18 @@ class VoyagerDocs implements GenericPlugin, ProtectedRoutes, MenuItems, JS
 
     public function provideMenuItems(MenuManager $menumanager): void
     {
-        $item = (new MenuItem('Documentation', 'document-search'))->route('voyager.voyager-docs');
-
         $menumanager->addItems(
             (new MenuItem())->divider(),
-            $item
+            (new MenuItem('Documentation', 'document-search'))->route('voyager.voyager-docs')
         );
+
+        $menumanager->addItems(
+            (new UserMenuItem('Documentation'))->route('voyager.voyager-docs')
+        );
+    }
+
+    private function getTOC(): string
+    {
+        return Str::after(file_get_contents(base_path('vendor/voyager-admin/voyager/docs/summary.md')), "\n");
     }
 }
