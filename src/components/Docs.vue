@@ -1,9 +1,16 @@
 <template>
     <div>
+        <Card title="On this page">
+            <div class="inline-flex space-x-2">
+                <a class="button accent" v-for="heading in headings" :key="`heading-${heading}`" :href="`#${slugify(heading, { lower: true })}`">
+                    {{ heading }}
+                </a>
+            </div>
+        </Card>
         <Card :title="title">
             <template #actions>
                 <SlideIn>
-                    <MarkdownView :options="{ baseUrl: base }" :renderer="renderer()">{{ toc }}</MarkdownView>
+                    <MarkdownView :options="{ baseUrl: base }" :renderer="renderer(true)">{{ toc }}</MarkdownView>
                     <template #opener>
                         <button class="button blue">Menu</button>
                     </template>
@@ -43,20 +50,40 @@ export default {
         path: String,
     },
     methods: {
-        renderer() {
+        renderer(toc = false) {
             let base = this.base;
+            let path = this.path;
             return {
-                heading(text, level) {
-                    return `<h${level} class="my-2" id="${slugify(text, { lower: true })}">${text}</h${level}>`;
-                },
                 image(href, title, text) {
                     return `<img src="${base}${href.replace('../', '')}" alt="${title || text}" class="mx-auto py-2 max-w-full lg:max-w-4/6 cursor-pointer">`;
                 },
                 table(header, body) {
                     return `<div class="voyager-table striped"><table><thead>${header}</thead>${body}</table></div>`;
+                },
+                heading(src, level) {
+                    if (toc) {
+                        return `<h${level} class="mt-4 mb-2 text-white">${src}</h${level}>`;
+                    }
+                    // Strip out first heading (shown in card header)
+                    if (level == 1) {
+                        return '';
+                    }
+
+                    return `<h${level+1} class="mt-4" id="${slugify(src, { lower: true })}">${src}</h${level+1}>`;
+                },
+                link(href, title, text) {
+                    if (toc) {
+                        return `<a href="${base}${href}" style="color: #cbd5e0 !important">${text}</a>`;
+                    }
+
+                    if (href.startsWith('http://') || href.startsWith('https://')) {
+                        return `<a href="${href}" target="_blank">${text}</a>`;
+                    }
+
+                    return `<a href="${path}${href}">${text}</a>`;
                 }
             }
-        }
+        },
     },
     data() {
         return {
@@ -75,6 +102,8 @@ export default {
                 });
             }
         });
+
+        
     },
     created() {
         document.addEventListener('DOMContentLoaded', (event) => {
