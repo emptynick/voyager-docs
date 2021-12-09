@@ -1,5 +1,21 @@
 <template>
     <div>
+        <Card title="Menu">
+            <div class="grid grid-cols-4 gap-4">
+                <Collapsible v-for="heading in tocs" :title="heading.title" :key="`heading-${heading.title}`" :titleSize="5" closed>
+                    <ul>
+                        <li v-for="child in heading.children" :key="`child-${child.title}`">
+                            <span v-html="markdownToLink(child.title)"></span>
+                            <ul v-if="child.children.length > 0" class="ml-4">
+                                <li v-for="subChild in child.children" :key="`subchild-${subChild.title}`">
+                                    <span v-html="markdownToLink(subChild.title)"></span>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </Collapsible>
+            </div>
+        </Card>
         <Card title="On this page">
             <div class="flex-wrap space-x-2 space-y-2">
                 <a class="button accent" v-for="heading in headings" :key="`heading-${heading}`" :href="`#${slugify(heading, { lower: true })}`">
@@ -8,20 +24,12 @@
             </div>
         </Card>
         <Card :title="title">
-            <template #actions>
-                <SlideIn>
-                    <MarkdownView :options="{ baseUrl: base }" :renderer="renderer(true)">{{ toc }}</MarkdownView>
-                    <template #opener>
-                        <button class="button blue">Menu</button>
-                    </template>
-                </SlideIn>
-            </template>
             <div id="doc-content">
                 <MarkdownView :options="{ baseUrl: path }" :renderer="renderer()" ref="mdcontent">{{ content }}</MarkdownView>
             </div>
         </Card>
         <Modal ref="imageModal" :title="selectedImageTitle" size="full">
-            <div class="w-full inline-flex self-center">
+            <div class="w-full inline-flex justify-center">
                 <img :src="selectedImageSource" class="max-w-full">
             </div>
         </Modal>
@@ -52,7 +60,7 @@ export default {
         path: String,
     },
     methods: {
-        renderer(toc = false) {
+        renderer() {
             let base = this.base;
             let path = this.path;
             return {
@@ -63,9 +71,6 @@ export default {
                     return `<div class="voyager-table striped"><table><thead>${header}</thead>${body}</table></div>`;
                 },
                 heading(src, level) {
-                    if (toc) {
-                        return `<h${level} class="mt-4 mb-2 text-white">${src}</h${level}>`;
-                    }
                     // Strip out first heading (shown in card header)
                     if (level == 1) {
                         return '';
@@ -75,10 +80,6 @@ export default {
                     return `<h${level+1} class="mt-4" id="${slugify(src, { lower: true })}">${src}</h${level+1}>`;
                 },
                 link(href, title, text) {
-                    if (toc) {
-                        return `<a href="${base}${href}" style="color: #cbd5e0 !important">${text}</a>`;
-                    }
-
                     if (href.startsWith('http://') || href.startsWith('https://')) {
                         return `<a href="${href}" target="_blank">${text}</a>`;
                     }
@@ -87,13 +88,15 @@ export default {
                 }
             }
         },
+        markdownToLink(input) {
+            return input.replace(/\[(.*?)\]\((.*?)\)/gim, `<a href="${this.base}$2">$1</a>`);
+        }
     },
     data() {
         return {
             selectedImageSource: null,
             selectedImageTitle: null,
             headings: [],
-            heads: [],
         }
     },
     mounted() {
@@ -107,8 +110,34 @@ export default {
                 });
             }
         });
+    },
+    computed: {
+        tocs() {
+            let toc = [];
+            this.toc.split(/\r?\n/).filter((x) => x !== '').forEach((line) => {
+                if (line.startsWith('##')) {
+                    toc.push({
+                        title: line.substr(3),
+                        children: []
+                    });
+                } else if (toc.length > 0) {
+                    if (line.startsWith('*')) {
+                        toc[toc.length - 1].children.push({
+                            title: line.substr(2),
+                            children: [],
+                        });
+                    } else if (line.startsWith('  *')) {
+                        let l = toc.length - 1;
+                        toc[l].children[toc[l].children.length - 1].children.push({
+                            title: line.substr(4),
+                            children: [],
+                        });
+                    }
+                }
+            });
 
-        
+            return toc;
+        }
     },
     created() {
         document.addEventListener('DOMContentLoaded', (event) => {

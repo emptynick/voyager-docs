@@ -54,7 +54,7 @@ class VoyagerDocs implements GenericPlugin, ProtectedRoutes, MenuItems, JS
                     'content'   => $content,
                     'toc'       => Str::after(file_get_contents(base_path('vendor/voyager-admin/voyager/docs/summary.md')), "\n"),
                     'path'      => Str::beforeLast(\Request::url(), '/').'/',
-                    'base'      => route('voyager.voyager-docs').'/',
+                    'base'      => Str::finish(route('voyager.voyager-docs'), '/'),
                 ])->withViewData('title', $title);
             }
 
