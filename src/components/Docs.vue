@@ -1,7 +1,7 @@
 <template>
     <div>
         <Card title="Menu">
-            <div class="grid grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 <Collapsible v-for="heading in tocs" :title="heading.title" :key="`heading-${heading.title}`" :titleSize="5" closed>
                     <ul>
                         <li v-for="child in heading.children" :key="`child-${child.title}`">
@@ -15,15 +15,19 @@
                     </ul>
                 </Collapsible>
             </div>
+            <Card title="On this page" class="mt-4">
+                <div class="flex-wrap space-x-2 space-y-2">
+                    <a class="button accent" v-for="heading in headings" :key="`heading-${heading}`" :href="`#${slugify(heading, { lower: true })}`">
+                        {{ heading }}
+                    </a>
+                </div>
+            </Card>
         </Card>
-        <Card title="On this page">
-            <div class="flex-wrap space-x-2 space-y-2">
-                <a class="button accent" v-for="heading in headings" :key="`heading-${heading}`" :href="`#${slugify(heading, { lower: true })}`">
-                    {{ heading }}
-                </a>
-            </div>
-        </Card>
+        
         <Card :title="title">
+            <template #actions>
+                <a :href="`https://github.dev/voyager-admin/voyager/tree/2.x/docs/${page}`" target="_blank" class="button accent">Edit on Github</a>
+            </template>
             <div id="doc-content">
                 <MarkdownView :options="{ baseUrl: path }" :renderer="renderer()" ref="mdcontent">{{ content }}</MarkdownView>
             </div>
@@ -58,6 +62,7 @@ export default {
         toc: String,
         base: String,
         path: String,
+        page: String,
     },
     methods: {
         renderer() {

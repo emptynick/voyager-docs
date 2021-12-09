@@ -31,6 +31,7 @@ class VoyagerDocs implements GenericPlugin, ProtectedRoutes, MenuItems, JS
         Inertia::setRootView('voyager::app');
 
         Route::get('docs/{path?}', function ($path = 'introduction.md') {
+            $relative = $path;
             $path = base_path('vendor/voyager-admin/voyager/docs/').$path;
             if (File::exists($path)) {
                 $content = file_get_contents($path);
@@ -55,6 +56,7 @@ class VoyagerDocs implements GenericPlugin, ProtectedRoutes, MenuItems, JS
                     'toc'       => Str::after(file_get_contents(base_path('vendor/voyager-admin/voyager/docs/summary.md')), "\n"),
                     'path'      => Str::beforeLast(\Request::url(), '/').'/',
                     'base'      => Str::finish(route('voyager.voyager-docs'), '/'),
+                    'page'      => $relative,
                 ])->withViewData('title', $title);
             }
 
