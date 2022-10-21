@@ -5,9 +5,7 @@
             
             <Card title="On this page" class="mt-4">
                 <div class="flex-wrap space-x-2 space-y-2">
-                    <a class="button accent" v-for="heading in headings" :key="`heading-${heading}`" :href="`#${slugify(heading, { lower: true })}`">
-                        {{ heading }}
-                    </a>
+                    <a class="button accent" v-for="heading in headings" :key="`heading-${heading}`" :href="`#${slugify(heading, { lower: true })}`" v-html="heading"></a>
                 </div>
             </Card>
         </Card>
@@ -35,13 +33,13 @@ import php from 'highlight.js/lib/languages/php';
 import css from 'highlight.js/lib/languages/css';
 import json from 'highlight.js/lib/languages/json';
 import javascript from 'highlight.js/lib/languages/javascript';
-
-import EventBus from 'eventbus';
+import bash from 'highlight.js/lib/languages/bash';
 
 hljs.registerLanguage('php', php);
 hljs.registerLanguage('css', css);
 hljs.registerLanguage('json', json);
 hljs.registerLanguage('javascript', javascript);
+hljs.registerLanguage('bash', bash);
 
 import TOC from './TOC.vue';
 
@@ -61,9 +59,10 @@ export default {
         renderer() {
             let base = this.base;
             let path = this.path;
+            let headings = this.headings;
             return {
                 image(href, title, text) {
-                    return `<img src="${base}${href.replace('../', '')}" alt="${title || text}" class="mx-auto py-2 max-w-full lg:max-w-4/6 cursor-pointer">`;
+                    return `<img src="${base}public${href.replace('../', '')}" alt="${title || text}" class="mx-auto py-2 max-w-full lg:max-w-4/6 cursor-pointer">`;
                 },
                 table(header, body) {
                     return `<div class="voyager-table striped"><table><thead>${header}</thead>${body}</table></div>`;
@@ -73,7 +72,7 @@ export default {
                     if (level == 1) {
                         return '';
                     }
-                    EventBus.emit('docs-push-heading', src);
+                    headings.push(src);
 
                     return `<h${level+1} class="mt-4" id="${slugify(src, { lower: true })}">${src}</h${level+1}>`;
                 },
@@ -82,7 +81,12 @@ export default {
                         return `<a href="${href}" target="_blank">${text}</a>`;
                     }
 
-                    return `<a href="${path}${href}">${text}</a>`;
+                    if (href.startsWith('#')) {
+                        return `<a href="${href}">${text}</a>`;
+                    }
+
+                    let link = (path + href).split(/\/{1,}/).filter(a=>!a.match(/^\s*$/)).join('/').replace(':/','://')
+                    return `<a href="${link}">${text}</a>`;
                 }
             }
         },
@@ -95,7 +99,7 @@ export default {
         }
     },
     mounted() {
-        document.getElementById('doc-content').getElementsByTagName('img').forEach((image) => {
+        [...document.getElementById('doc-content').getElementsByTagName('img')].forEach((image) => {
             if (image.src.startsWith(this.base)) {
                 image.addEventListener('click', () => {
                     this.selectedImageSource = image.src;
@@ -111,10 +115,6 @@ export default {
             document.querySelectorAll('pre code').forEach((el) => {
                 hljs.highlightElement(el);
             });
-        });
-
-        EventBus.on('docs-push-heading', (src) => {
-            this.headings.push(src);
         });
     }
 }

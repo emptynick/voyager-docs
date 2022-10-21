@@ -37,13 +37,26 @@ class VoyagerDocs implements GenericPlugin, ProtectedRoutes, MenuItems, JS, Widg
     {
         Inertia::setRootView('voyager::app');
 
-        Route::get('docs/{path?}', function ($path = 'introduction.md') {
-            $relative = $path;
-            $path = base_path('vendor/voyager-admin/voyager/docs/').$path;
+        Route::get('docs/{path?}', function ($path = 'index.md') {
+            $relative = Str::finish($path, '.md');
+            if (Str::contains($path, 'public')) {
+                $relative = $path;
+            }
+            $path = base_path('vendor/voyager-admin/voyager/docs/').$relative;
+
+            if (!File::exists($path) && File::isDirectory(Str::beforeLast($path, '.md'))) {
+                $folder = Str::beforeLast($path, '.md');
+
+                if (File::exists($folder.'/index.md')) {
+                    $path = $folder.'/index.md';
+                }
+            }
+    
             if (File::exists($path)) {
                 $content = file_get_contents($path);
 
-                if (Str::contains($path, '.gitbook')) {
+                if (Str::contains($path, 'public')) {
+                    $path = Str::beforeLast($path, '.md');
                     $extension = Str::afterLast($path, '.');
                     $mime = $this->mime_extensions[$extension] ?? File::mimeType($path);
 
@@ -80,7 +93,7 @@ class VoyagerDocs implements GenericPlugin, ProtectedRoutes, MenuItems, JS, Widg
     {
         $menumanager->addItems(
             (new MenuItem())->divider(),
-            (new MenuItem('Documentation', 'document-search'))->route('voyager.voyager-docs')
+            (new MenuItem('Documentation', 'document-magnifying-glass'))->route('voyager.voyager-docs')
         );
 
         $menumanager->addItems(
@@ -88,8 +101,8 @@ class VoyagerDocs implements GenericPlugin, ProtectedRoutes, MenuItems, JS, Widg
         );
     }
 
-    private function getTOC(): string
+    private function getTOC(): mixed
     {
-        return Str::after(file_get_contents(base_path('vendor/voyager-admin/voyager/docs/summary.md')), "\n");
+        return json_decode(file_get_contents(base_path('vendor/voyager-admin/voyager/docs/.vitepress/sidebar.json')));
     }
 }

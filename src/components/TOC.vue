@@ -1,57 +1,41 @@
 <template>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <Collapsible v-for="heading in tocs" :title="heading.title" :key="`heading-${heading.title}`" :titleSize="5" closed>
-            <ul>
-                <li v-for="child in heading.children" :key="`child-${child.title}`">
-                    <span v-html="markdownToLink(child.title)"></span>
-                    <ul v-if="child.children.length > 0" class="ml-4">
-                        <li v-for="subChild in child.children" :key="`subchild-${subChild.title}`">
-                            <span v-html="markdownToLink(subChild.title)"></span>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </Collapsible>
+        <template v-for="heading in toc" :key="`heading-${heading.text}`">
+            <Collapsible v-if="heading.hasOwnProperty('children') && heading.children.length > 0" :title="heading.text" :titleSize="5" closed>
+                <ul>
+                    <li v-for="child in heading.children" :key="`child-${child.text}`">
+                        <template v-if="child.hasOwnProperty('children') && child.children.length > 0">
+                            <a :href="linkToUrl(child.link)">{{ child.text }}</a>
+                            <ul class="pl-2 rtl:pr-2">
+                                <li v-for="subchild in child.children">
+                                    <a :href="linkToUrl(subchild.link)">{{ subchild.text }}</a>
+                                </li>
+                            </ul>
+                        </template>
+                        <a v-else :href="linkToUrl(child.link)">{{ child.text }}</a>
+                    </li>
+                </ul>
+            </Collapsible>
+            <Card v-else>
+                <template v-slot:title>
+                    <a :href="linkToUrl(heading.link)">
+                        <h5 class="leading-6 font-medium">{{ heading.text }}</h5>
+                    </a>
+                </template>
+            </Card>
+        </template>
     </div>
 </template>
 
 <script>
 export default {
     props: {
-        toc: String,
+        toc: Object,
         base: String,
     },
-    computed: {
-        tocs() {
-            let toc = [];
-            this.toc.split(/\r?\n/).filter((x) => x !== '').forEach((line) => {
-                if (line.startsWith('##')) {
-                    toc.push({
-                        title: line.substr(3),
-                        children: []
-                    });
-                } else if (toc.length > 0) {
-                    if (line.startsWith('*')) {
-                        toc[toc.length - 1].children.push({
-                            title: line.substr(2),
-                            children: [],
-                        });
-                    } else if (line.startsWith('  *')) {
-                        let l = toc.length - 1;
-                        toc[l].children[toc[l].children.length - 1].children.push({
-                            title: line.substr(4),
-                            children: [],
-                        });
-                    }
-                }
-            });
-
-            return toc;
-        }
-    },
     methods: {
-        markdownToLink(input) {
-            return input.replace(/\[(.*?)\]\((.*?)\)/gim, `<a href="${this.base}$2">$1</a>`);
+        linkToUrl(link) {
+            return (this.base + link).split(/\/{1,}/).filter(a=>!a.match(/^\s*$/)).join('/').replace(':/','://');
         }
     }
 }

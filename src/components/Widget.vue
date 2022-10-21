@@ -7,7 +7,7 @@ import TOC from './TOC.vue';
 
 export default {
     props: {
-        toc: String,
+        toc: Object,
         base: String,
     },
     components: { TOC }
